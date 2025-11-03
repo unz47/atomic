@@ -11,6 +11,7 @@ function App() {
   const [elements, setElements] = useState<ElementData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [rotationSpeed, setRotationSpeed] = useState(0.3); // 回転速度の倍率（1.0がデフォルト）
 
   // 元素データを取得
   useEffect(() => {
@@ -29,6 +30,45 @@ function App() {
     };
 
     loadElements();
+  }, []);
+
+  // スクロールイベントで回転速度を制御（throttle付き + 方向対応）
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    let isThrottled = false;
+    const baseSpeed = 0.3; // 基本速度
+
+    const handleWheel = (e: WheelEvent) => {
+      // throttle: 50ms毎に1回だけ処理
+      if (isThrottled) return;
+      isThrottled = true;
+      setTimeout(() => {
+        isThrottled = false;
+      }, 50);
+
+      // スクロール量と方向を計算
+      const delta = e.deltaY;
+      const scrollSpeed = Math.min(Math.abs(delta) / 20, 10); // 最大10倍まで（感度2倍）
+      const direction = delta > 0 ? 1 : -1; // 下スクロール: 1, 上スクロール: -1
+
+      // 回転速度を更新（方向を考慮）
+      setRotationSpeed(baseSpeed * direction * (1.0 + scrollSpeed));
+
+      // タイムアウトをクリア
+      clearTimeout(timeoutId);
+
+      // 0.8秒後に速度を元に戻す
+      timeoutId = setTimeout(() => {
+        setRotationSpeed(baseSpeed);
+      }, 800);
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   // ローディング中の表示
@@ -101,10 +141,10 @@ function App() {
         <directionalLight position={[5, 5, 5]} intensity={1} />
 
         {/* 選択された元素の原子モデル */}
-        {selectedElement && <Element elementData={selectedElement} />}
+        {selectedElement && <Element elementData={selectedElement} rotationSpeed={rotationSpeed} />}
 
-        {/* カメラコントロール（マウスで回転・ズーム） */}
-        <OrbitControls enableDamping={false} />
+        {/* カメラコントロール（マウスで回転のみ） */}
+        <OrbitControls enableDamping={false} enableZoom={false} />
 
         {/* FPS表示（左上） */}
         <Stats />

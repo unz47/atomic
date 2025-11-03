@@ -3,9 +3,10 @@ import { ElementData } from './data/elementsDB';
 
 interface ElementProps {
   elementData: ElementData;
+  rotationSpeed?: number;
 }
 
-export function Element({ elementData }: ElementProps) {
+export function Element({ elementData, rotationSpeed = 1.0 }: ElementProps) {
   return (
     <AtomModel
       protonCount={elementData.protons}
@@ -13,6 +14,7 @@ export function Element({ elementData }: ElementProps) {
       electronShells={elementData.electronShells}
       nucleusRadius={elementData.nucleusRadius}
       particleRadius={elementData.particleRadius}
+      rotationSpeed={rotationSpeed}
     />
   );
 }

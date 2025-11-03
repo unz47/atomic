@@ -46,6 +46,7 @@ interface AtomModelProps {
   attractionForce?: number;
   dampening?: number;
   centerForce?: number;
+  rotationSpeed?: number;
 }
 
 export function AtomModel({
@@ -58,6 +59,7 @@ export function AtomModel({
   attractionForce = 0.000003,
   dampening = 0.9,
   centerForce = 0.000001,
+  rotationSpeed = 1.0,
 }: AtomModelProps) {
   // 陽子と中性子の位置と速度を管理
   const particlesRef = useRef<{
@@ -258,23 +260,23 @@ export function AtomModel({
       }
     });
 
-    // 各軌道を回転
+    // 各軌道を回転（rotationSpeedを適用）
     electronShells.forEach((_, shellIndex) => {
       const orbitGroup = orbitRefs.current[shellIndex];
       if (orbitGroup) {
-        orbitGroup.rotation.x += delta * (0.3 + shellIndex * 0.1);
-        orbitGroup.rotation.y += delta * (0.2 + shellIndex * 0.05);
-        orbitGroup.rotation.z += delta * (0.15 + shellIndex * 0.08);
+        orbitGroup.rotation.x += delta * (0.3 + shellIndex * 0.1) * rotationSpeed;
+        orbitGroup.rotation.y += delta * (0.2 + shellIndex * 0.05) * rotationSpeed;
+        orbitGroup.rotation.z += delta * (0.15 + shellIndex * 0.08) * rotationSpeed;
       }
 
-      // 各電子を軌道上で移動
+      // 各電子を軌道上で移動（rotationSpeedを適用）
       const electrons = electronRefs.current[shellIndex];
       const angles = angleRefs.current[shellIndex];
       const radius = electronShells[shellIndex].radius;
 
       electrons.forEach((electron, electronIndex) => {
         if (electron && angles) {
-          angles[electronIndex] += delta * (1.0 - shellIndex * 0.1);
+          angles[electronIndex] += delta * (1.0 - shellIndex * 0.1) * rotationSpeed;
           electron.position.x = Math.cos(angles[electronIndex]) * radius;
           electron.position.z = Math.sin(angles[electronIndex]) * radius;
         }
