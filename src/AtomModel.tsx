@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Sphere, Torus } from '@react-three/drei';
 import * as THREE from 'three';
@@ -61,18 +61,12 @@ export function AtomModel({
   centerForce = 0.000001,
   rotationSpeed = 1.0,
 }: AtomModelProps) {
-  // 陽子と中性子の位置と速度を管理
-  const particlesRef = useRef<{
-    protons: Particle[];
-    neutrons: Particle[];
-  } | null>(null);
-
-  // 初期化（一度だけ）
-  if (!particlesRef.current) {
+  // 陽子と中性子の初期位置を計算（useMemoで同期的に計算）
+  const initialParticles = useMemo((): { protons: Particle[]; neutrons: Particle[] } => {
     const protonPositions = generateSpherePositions(protonCount, nucleusRadius);
     const neutronPositions = generateSpherePositions(neutronCount, nucleusRadius);
 
-    particlesRef.current = {
+    return {
       protons: protonPositions.map(pos => ({
         position: pos.clone(),
         velocity: new THREE.Vector3(0, 0, 0),
@@ -82,7 +76,15 @@ export function AtomModel({
         velocity: new THREE.Vector3(0, 0, 0),
       })),
     };
-  }
+  }, [protonCount, neutronCount, nucleusRadius]);
+
+  // 陽子と中性子の位置と速度を管理
+  const particlesRef = useRef(initialParticles);
+
+  // 元素が変更されたら粒子データを更新
+  useEffect(() => {
+    particlesRef.current = initialParticles;
+  }, [initialParticles]);
 
   // 表示用の陽子と中性子のref
   const protonMeshRefs = useRef<(THREE.Mesh | null)[]>([]);
@@ -93,14 +95,17 @@ export function AtomModel({
   const electronRefs = useRef<(THREE.Mesh | null)[][]>([]);
   const angleRefs = useRef<number[][]>([]);
 
-  // 初期化
-  if (angleRefs.current.length === 0) {
+  // 電子殻が変更されたら電子データを初期化
+  useEffect(() => {
+    angleRefs.current = [];
+    electronRefs.current = [];
+
     electronShells.forEach((shell) => {
       const angles = Array(shell.electrons).fill(0).map((_, i) => (i / shell.electrons) * Math.PI * 2);
       angleRefs.current.push(angles);
       electronRefs.current.push([]);
     });
-  }
+  }, [electronShells]);
 
   // 陽子用のグラデーションシェーダーマテリアル
   const protonMaterial = useMemo(() => {
@@ -292,7 +297,7 @@ export function AtomModel({
   return (
     <group>
       {/* 原子核: 陽子（赤） */}
-      {particlesRef.current?.protons.map((particle, index) => (
+      {initialParticles.protons.map((particle, index) => (
         <Sphere
           key={`proton-${index}`}
           ref={el => {
@@ -306,7 +311,7 @@ export function AtomModel({
       ))}
 
       {/* 原子核: 中性子（黄緑） */}
-      {particlesRef.current?.neutrons.map((particle, index) => (
+      {initialParticles.neutrons.map((particle, index) => (
         <Sphere
           key={`neutron-${index}`}
           ref={el => {

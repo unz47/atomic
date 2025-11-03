@@ -36,6 +36,7 @@ function App() {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     let isThrottled = false;
+    let lastDirection = 1; // 最後のスクロール方向を保持（1: 正方向, -1: 逆方向）
     const baseSpeed = 0.3; // 基本速度
 
     const handleWheel = (e: WheelEvent) => {
@@ -48,8 +49,11 @@ function App() {
 
       // スクロール量と方向を計算
       const delta = e.deltaY;
-      const scrollSpeed = Math.min(Math.abs(delta) / 20, 10); // 最大10倍まで（感度2倍）
+      const scrollSpeed = Math.min(Math.abs(delta) / 10, 10); // 最大10倍まで（感度2倍）
       const direction = delta > 0 ? 1 : -1; // 下スクロール: 1, 上スクロール: -1
+
+      // 最後の方向を記憶
+      lastDirection = direction;
 
       // 回転速度を更新（方向を考慮）
       setRotationSpeed(baseSpeed * direction * (1.0 + scrollSpeed));
@@ -57,9 +61,9 @@ function App() {
       // タイムアウトをクリア
       clearTimeout(timeoutId);
 
-      // 0.8秒後に速度を元に戻す
+      // 0.8秒後に最後の方向の基本速度に戻す
       timeoutId = setTimeout(() => {
-        setRotationSpeed(baseSpeed);
+        setRotationSpeed(baseSpeed * lastDirection);
       }, 800);
     };
 
@@ -141,7 +145,13 @@ function App() {
         <directionalLight position={[5, 5, 5]} intensity={1} />
 
         {/* 選択された元素の原子モデル */}
-        {selectedElement && <Element elementData={selectedElement} rotationSpeed={rotationSpeed} />}
+        {selectedElement && (
+          <Element
+            key={selectedElement.atomicNumber}
+            elementData={selectedElement}
+            rotationSpeed={rotationSpeed}
+          />
+        )}
 
         {/* カメラコントロール（マウスで回転のみ） */}
         <OrbitControls enableDamping={false} enableZoom={false} />
