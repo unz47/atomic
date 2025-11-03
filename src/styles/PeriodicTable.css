@@ -1,0 +1,245 @@
+/* 周期表メニューのコンテナ */
+.periodic-table-container {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* トグルボタン */
+.toggle-button {
+  margin-left: 10%;
+  padding: 15px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 30px 30px 0 0;
+  cursor: pointer;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.9;
+}
+
+.toggle-button:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: scale(1.05);
+  opacity: 1;
+}
+
+.toggle-button-arrow {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.toggle-button-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* 周期表グリッド */
+.periodic-table-menu {
+  background: rgba(26, 26, 46, 0.5);
+  backdrop-filter: blur(5px);
+  border-radius: 20px 20px 0 0;
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.4s ease;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.periodic-table-menu.open {
+  max-height: 750px;
+  opacity: 1;
+  padding: 30px;
+}
+
+.periodic-table-grid {
+  display: grid;
+  grid-template-columns: repeat(18, 60px);
+  grid-template-rows: repeat(9, 60px);
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+/* 元素ボタン */
+.element-button {
+  width: 60px;
+  height: 60px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  opacity: 0.9;
+}
+
+.element-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.element-button:hover::before {
+  opacity: 1;
+}
+
+.element-button:hover {
+  transform: scale(1.15);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  opacity: 1;
+}
+
+.element-button.active {
+  border-color: #ff3333;
+  box-shadow: 0 0 20px rgba(255, 51, 51, 0.6);
+  animation: pulse 1.5s infinite;
+  opacity: 1;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 51, 51, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 51, 51, 0.9);
+  }
+}
+
+.element-symbol {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+.element-number {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  position: absolute;
+  top: 4px;
+  left: 6px;
+}
+
+.element-name {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50px;
+}
+
+/* 元素カテゴリーごとの色 */
+.element-button.alkali-metal {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+.element-button.alkaline-earth {
+  background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+}
+
+.element-button.transition-metal {
+  background: linear-gradient(135deg, #48dbfb 0%, #0abde3 100%);
+}
+
+.element-button.post-transition {
+  background: linear-gradient(135deg, #1dd1a1 0%, #10ac84 100%);
+}
+
+.element-button.metalloid {
+  background: linear-gradient(135deg, #54a0ff 0%, #2e86de 100%);
+}
+
+.element-button.nonmetal {
+  background: linear-gradient(135deg, #00d2d3 0%, #01a3a4 100%);
+}
+
+.element-button.halogen {
+  background: linear-gradient(135deg, #5f27cd 0%, #341f97 100%);
+}
+
+.element-button.noble-gas {
+  background: linear-gradient(135deg, #c8d6e5 0%, #8395a7 100%);
+}
+
+.element-button.lanthanide {
+  background: linear-gradient(135deg, #ff9ff3 0%, #feca57 100%);
+}
+
+.element-button.actinide {
+  background: linear-gradient(135deg, #ee5a6f 0%, #c23616 100%);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 1200px) {
+  .periodic-table-grid {
+    grid-template-columns: repeat(18, 50px);
+    grid-template-rows: repeat(9, 50px);
+    gap: 3px;
+  }
+
+  .element-button {
+    width: 50px;
+    height: 50px;
+  }
+
+  .element-symbol {
+    font-size: 16px;
+  }
+
+  .element-number {
+    font-size: 9px;
+  }
+
+  .element-name {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 900px) {
+  .periodic-table-grid {
+    grid-template-columns: repeat(18, 40px);
+    grid-template-rows: repeat(9, 40px);
+    gap: 2px;
+  }
+
+  .element-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .element-symbol {
+    font-size: 14px;
+  }
+
+  .element-number {
+    font-size: 8px;
+    top: 2px;
+    left: 4px;
+  }
+
+  .element-name {
+    font-size: 7px;
+  }
+}

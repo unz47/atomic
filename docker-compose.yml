@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # DynamoDB Local
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: periodic-table-dynamodb
+    ports:
+      - "8000:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    volumes:
+      - ./dynamodb-data:/home/dynamodblocal/data
+    working_dir: /home/dynamodblocal
+    networks:
+      - periodic-table-network
+
+  # DynamoDB Admin UI (オプション)
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: periodic-table-dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://dynamodb-local:8000
+      - AWS_REGION=ap-northeast-1
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+    depends_on:
+      - dynamodb-local
+    networks:
+      - periodic-table-network
+
+networks:
+  periodic-table-network:
+    driver: bridge
