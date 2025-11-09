@@ -49,7 +49,7 @@ function App() {
 
       // スクロール量と方向を計算
       const delta = e.deltaY;
-      const scrollSpeed = Math.min(Math.abs(delta) / 10, 10); // 最大10倍まで（感度2倍）
+      const scrollSpeed = Math.min(Math.abs(delta) / 1, 30); // 最大10倍まで（感度2倍）
       const direction = delta > 0 ? 1 : -1; // 下スクロール: 1, 上スクロール: -1
 
       // 最後の方向を記憶
