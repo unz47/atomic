@@ -4,6 +4,7 @@ import { OrbitControls, Stats } from '@react-three/drei';
 import { Element } from './Element';
 import { ElementData } from './data/elementsDB';
 import { PeriodicTableMenu } from './components/PeriodicTableMenu';
+import { ElementInfo } from './components/ElementInfo';
 import { fetchAllElements } from './services/elementService';
 
 function App() {
@@ -21,6 +22,12 @@ function App() {
         const data = await fetchAllElements();
         setElements(data);
         setError(null);
+
+        // デフォルトで水素（原子番号1）を選択
+        const hydrogen = data.find(el => el.atomicNumber === 1);
+        if (hydrogen) {
+          setSelectedElement(hydrogen);
+        }
       } catch (err) {
         console.error('Failed to load elements:', err);
         setError('元素データの読み込みに失敗しました');
@@ -159,6 +166,9 @@ function App() {
         {/* FPS表示（左上） */}
         <Stats />
       </Canvas>
+
+      {/* 元素情報表示 */}
+      {selectedElement && <ElementInfo element={selectedElement} />}
 
       {/* 周期表メニュー */}
       <PeriodicTableMenu
